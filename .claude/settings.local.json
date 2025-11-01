@@ -23,7 +23,8 @@
       "Bash(git branch:*)",
       "Bash(git add:*)",
       "Bash(git commit -m \"$(cat <<''EOF''\nInitial commit - GitHub PR Review Assistant v1.0\n\nProduction-ready Chrome extension with landing page.\n\nFeatures:\n- AI-powered PR analysis with GPT-4o-mini\n- Impact scoring algorithm v2.4\n- Pattern detection (security, quality, complexity)\n- Analytics dashboard\n- Subscription tiers (Free/Pro/Team)\n- Professional landing page\n\n✅ Security: No exposed API keys\n✅ Branding: Powered by ChatGPT\n✅ Production: All flags set, placeholders removed\n\n🤖 Generated with Claude Code\nhttps://claude.com/claude-code\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
