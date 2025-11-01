@@ -1,0 +1,39 @@
+# Environment variables
+.env
+.env.local
+
+# API Keys and secrets
+secrets.json
+config.json
+
+# Node modules (if using build tools later)
+node_modules/
+package-lock.json
+
+# Build artifacts
+dist/
+build/
+*.zip
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing - PR Review Assistant</title>
+  <link rel="stylesheet" href="pricing.css">
+</head>
+<body>
+  <div class="pricing-container">
+    <header class="pricing-header">
+      <h1>🚀 Choose Your Plan</h1>
+      <p class="subtitle">Supercharge your PR reviews with AI-powered insights</p>
+      <div class="current-plan" id="current-plan">
+        <span class="plan-badge">Current Plan: <strong id="current-tier">Free</strong></span>
+      </div>
+    </header>
+
+    <div class="pricing-grid">
+      <!-- Free Tier -->
+      <div class="pricing-card free">
+        <div class="card-header">
+          <h2>Free</h2>
+          <div class="price">
+            <span class="amount">$0</span>
+            <span class="period">/month</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <ul class="features">
+            <li class="included">✅ 5 PR analyses per week</li>
+            <li class="included">✅ Basic impact scoring</li>
+            <li class="included">✅ Code highlighting</li>
+            <li class="included">✅ Security pattern detection</li>
+            <li class="not-included">❌ Custom keywords</li>
+            <li class="not-included">❌ Advanced metrics</li>
+            <li class="not-included">❌ Data export</li>
+            <li class="not-included">❌ Priority support</li>
+          </ul>
+        </div>
+        <div class="card-footer">
+          <button class="btn-plan current" data-tier="free" disabled>Current Plan</button>
+        </div>
+      </div>
+
+      <!-- Pro Tier -->
+      <div class="pricing-card pro popular">
+        <div class="popular-badge">Most Popular</div>
+        <div class="card-header">
+          <h2>Pro</h2>
+          <div class="price">
+            <span class="amount">$9</span>
+            <span class="period">/month</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <ul class="features">
+            <li class="included">✅ <strong>Unlimited</strong> PR analyses</li>
+            <li class="included">✅ All Free features</li>
+            <li class="included">✅ Custom security keywords</li>
+            <li class="included">✅ Advanced analytics dashboard</li>
+            <li class="included">✅ CSV/JSON data export</li>
+            <li class="included">✅ Time tracking insights</li>
+            <li class="not-included">❌ Team collaboration</li>
+            <li class="not-included">❌ Priority support</li>
+          </ul>
+        </div>
+        <div class="card-footer">
+          <button class="btn-plan pro" data-tier="pro">Upgrade to Pro</button>
+        </div>
+      </div>
+
+      <!-- Team Tier -->
+      <div class="pricing-card team">
+        <div class="card-header">
+          <h2>Team</h2>
+          <div class="price">
+            <span class="amount">$29</span>
+            <span class="period">/month</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <ul class="features">
+            <li class="included">✅ All Pro features</li>
+            <li class="included">✅ Team analytics aggregation</li>
+            <li class="included">✅ Shared custom rules</li>
+            <li class="included">✅ Priority support</li>
+            <li class="included">✅ Advanced reporting</li>
+            <li class="included">✅ API access</li>
+            <li class="included">✅ Custom integrations</li>
+            <li class="included">✅ Dedicated account manager</li>
+          </ul>
+        </div>
+        <div class="card-footer">
+          <button class="btn-plan team" data-tier="team">Upgrade to Team</button>
+        </div>
+      </div>
+
+      <!-- Enterprise Tier -->
+      <div class="pricing-card enterprise">
+        <div class="card-header">
+          <h2>Enterprise</h2>
+          <div class="price">
+            <span class="amount">Custom</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <ul class="features">
+            <li class="included">✅ All Team features</li>
+            <li class="included">✅ Self-hosted option</li>
+            <li class="included">✅ SSO/SAML integration</li>
+            <li class="included">✅ Custom AI models</li>
+            <li class="included">✅ SLA guarantees</li>
+            <li class="included">✅ Compliance certifications</li>
+            <li class="included">✅ Dedicated infrastructure</li>
+            <li class="included">✅ 24/7 support</li>
+          </ul>
+        </div>
+        <div class="card-footer">
+          <button class="btn-plan enterprise" data-tier="enterprise">Contact Sales</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-section">
+      <h2>💬 Frequently Asked Questions</h2>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h3>Can I cancel anytime?</h3>
+          <p>Yes! Cancel your subscription at any time. You'll retain access until the end of your billing period.</p>
+        </div>
+        <div class="faq-item">
+          <h3>What payment methods do you accept?</h3>
+          <p>We accept all major credit cards, debit cards, and various local payment methods through Stripe.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Do you offer refunds?</h3>
+          <p>We offer a 30-day money-back guarantee for all paid plans. No questions asked.</p>
+        </div>
+        <div class="faq-item">
+          <h3>How does the free tier work?</h3>
+          <p>You get 5 PR analyses per week (resets every Monday). Perfect for personal projects and trying out the tool.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Can I upgrade or downgrade?</h3>
+          <p>Yes! Upgrade anytime for immediate access. Downgrades take effect at the end of your current billing period.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Is my data secure?</h3>
+          <p>Absolutely. All data is encrypted in transit and at rest. We're SOC 2 Type II compliant (Enterprise tier).</p>
+        </div>
+      </div>
+    </div>
+
+    <footer class="pricing-footer">
+      <p>All plans include regular updates and new features</p>
+      <p class="security-note">🔒 Secure payment processing by <strong>Stripe</strong></p>
+      <div class="footer-links">
+        <a href="#" id="manage-subscription">Manage Subscription</a>
+        <span>•</span>
+        <a href="#" id="back-to-extension">Back to Extension</a>
+      </div>
+    </footer>
+  </div>
+
+  <script src="../scripts/subscription.js"></script>
+  <script src="pricing.js"></script>
+</body>
+</html>

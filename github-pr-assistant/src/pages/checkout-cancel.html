@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout Cancelled - PR Review Assistant</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .cancel-container {
+      max-width: 600px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 60px 40px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .cancel-icon {
+      font-size: 80px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 1.6;
+      margin-bottom: 32px;
+      opacity: 0.95;
+    }
+
+    .free-features {
+      text-align: left;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+
+    .free-features h2 {
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+
+    .free-features ul {
+      list-style: none;
+    }
+
+    .free-features li {
+      padding: 8px 0;
+      font-size: 16px;
+    }
+
+    .free-features li::before {
+      content: "✅ ";
+      margin-right: 8px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: white;
+      color: #667eea;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s;
+      margin: 8px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: white;
+      border: 2px solid white;
+    }
+
+    .note {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="cancel-container">
+    <div class="cancel-icon">😔</div>
+    <h1>Checkout Cancelled</h1>
+    <p>No worries! Your payment was not processed. You can upgrade anytime you're ready.</p>
+
+    <div class="free-features">
+      <h2>You can still enjoy our Free tier:</h2>
+      <ul>
+        <li>5 PR analyses per week</li>
+        <li>Basic impact scoring</li>
+        <li>Code highlighting</li>
+        <li>Security pattern detection</li>
+      </ul>
+    </div>
+
+    <div>
+      <a href="pricing.html" class="btn">View Plans Again</a>
+      <a href="#" id="close-window" class="btn btn-secondary">Continue with Free</a>
+    </div>
+
+    <p class="note">💬 Have questions? Contact us at support@pr-assistant.com</p>
+  </div>
+
+  <script>
+    // Close window button
+    document.getElementById('close-window').addEventListener('click', (e) => {
+      e.preventDefault();
+      window.close();
+    });
+  </script>
+</body>
+</html>

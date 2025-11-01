@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PR Assistant Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="options-container">
+    <header class="options-header">
+      <h1>🤖 PR Assistant Settings</h1>
+      <p class="subtitle">Customize your review experience</p>
+    </header>
+
+    <main class="options-content">
+      <!-- Account Section -->
+      <section class="settings-section">
+        <h2>👤 Account</h2>
+        <div class="setting-item">
+          <div class="setting-info">
+            <label>GitHub Account</label>
+            <p class="setting-description" id="github-user">Loading...</p>
+          </div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <label>Subscription</label>
+            <p class="setting-description" id="subscription-status">Free Plan (5 analyses/week)</p>
+          </div>
+          <button id="upgrade-btn" class="btn-secondary">Upgrade to Pro</button>
+        </div>
+        <div class="setting-item">
+          <button id="signout-btn" class="btn-danger">Sign Out</button>
+        </div>
+      </section>
+
+      <!-- Preferences Section -->
+      <section class="settings-section">
+        <h2>⚙️ Preferences</h2>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <label for="auto-analyze">Auto-analyze PRs</label>
+            <p class="setting-description">Automatically analyze PRs when you open them</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="auto-analyze">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <label for="show-impact">Show Impact Scores</label>
+            <p class="setting-description">Display impact breakdown in analysis</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="show-impact" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <label for="enable-highlighting">Enable Code Highlighting</label>
+            <p class="setting-description">Highlight critical code in diff view</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="enable-highlighting" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Custom Rules Section (Pro Feature) -->
+      <section class="settings-section">
+        <h2>🎯 Custom Rules <span class="pro-badge">PRO</span></h2>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <label for="custom-keywords">Security Keywords</label>
+            <p class="setting-description">Additional keywords to flag as security-sensitive</p>
+          </div>
+        </div>
+        <textarea
+          id="custom-keywords"
+          class="setting-textarea"
+          placeholder="e.g., apiKey, privateKey, credentials&#10;One per line..."
+          rows="4"
+          disabled
+        ></textarea>
+        <p class="pro-message">⭐ Upgrade to Pro to customize security keywords</p>
+      </section>
+
+      <!-- About Section -->
+      <section class="settings-section">
+        <h2>ℹ️ About</h2>
+        <div class="setting-item">
+          <p class="about-text">
+            <strong>Version:</strong> 1.0.0<br>
+            <strong>Powered by:</strong> ChatGPT<br>
+            <strong>Support:</strong> <a href="https://github.com/yourusername/pr-assistant/issues">GitHub Issues</a>
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="options-footer">
+      <button id="save-btn" class="btn-primary">Save Settings</button>
+      <p class="save-status" id="save-status"></p>
+    </footer>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscription Successful - PR Review Assistant</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .success-container {
+      max-width: 600px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 60px 40px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .success-icon {
+      font-size: 80px;
+      margin-bottom: 24px;
+      animation: bounce 1s ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    h1 {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 1.6;
+      margin-bottom: 32px;
+      opacity: 0.95;
+    }
+
+    .feature-list {
+      text-align: left;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+
+    .feature-list h2 {
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+
+    .feature-list ul {
+      list-style: none;
+    }
+
+    .feature-list li {
+      padding: 8px 0;
+      font-size: 16px;
+    }
+
+    .feature-list li::before {
+      content: "✅ ";
+      margin-right: 8px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: white;
+      color: #667eea;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s;
+      margin: 8px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: white;
+      border: 2px solid white;
+    }
+
+    .note {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="success-container">
+    <div class="success-icon">🎉</div>
+    <h1>Welcome to <span id="tier-name">Pro</span>!</h1>
+    <p>Your subscription is now active. You have full access to all premium features.</p>
+
+    <div class="feature-list">
+      <h2>You can now enjoy:</h2>
+      <ul id="features-list">
+        <li>Unlimited PR analyses</li>
+        <li>Custom security keywords</li>
+        <li>Advanced analytics dashboard</li>
+        <li>CSV/JSON data export</li>
+        <li>Time tracking insights</li>
+      </ul>
+    </div>
+
+    <div>
+      <a href="#" id="close-window" class="btn">Start Analyzing PRs</a>
+      <a href="pricing.html" class="btn btn-secondary">View All Plans</a>
+    </div>
+
+    <p class="note">📧 A receipt has been sent to your email address</p>
+  </div>
+
+  <script src="../scripts/subscription.js"></script>
+  <script>
+    // Parse URL parameters to get subscription details
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+
+    // Update tier name if provided
+    const tier = urlParams.get('tier');
+    if (tier) {
+      document.getElementById('tier-name').textContent =
+        tier.charAt(0).toUpperCase() + tier.slice(1);
+
+      // Update features based on tier
+      if (tier === 'team') {
+        const featuresList = document.getElementById('features-list');
+        featuresList.innerHTML += `
+          <li>Team analytics aggregation</li>
+          <li>Shared custom rules</li>
+          <li>Priority support</li>
+        `;
+      }
+    }
+
+    // Close window button
+    document.getElementById('close-window').addEventListener('click', (e) => {
+      e.preventDefault();
+
+      // Notify background script of successful subscription
+      if (sessionId) {
+        chrome.runtime.sendMessage({
+          action: 'checkoutSuccess',
+          sessionId: sessionId,
+          tier: tier || 'pro'
+        });
+      }
+
+      // Close window after short delay
+      setTimeout(() => {
+        window.close();
+      }, 500);
+    });
+
+    // Auto-refresh subscription status
+    setTimeout(async () => {
+      try {
+        // Poll backend to verify subscription activation
+        console.log('✅ Subscription activated, verifying status...');
+
+        // In production, this would call backend to verify session
+        // const response = await fetch(`/verify-session/${sessionId}`);
+        // const data = await response.json();
+        // await window.subscriptionManager.handleWebhookUpdate(data);
+
+      } catch (error) {
+        console.error('Failed to verify subscription:', error);
+      }
+    }, 2000);
+  </script>
+</body>
+</html>
