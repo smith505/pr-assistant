@@ -302,8 +302,8 @@ body::-webkit-scrollbar-thumb:hover {
 .btn-secondary {
   flex: 1;
   padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #667eea;
+  border: 1px solid #667eea;
   color: white;
   border-radius: 6px;
   font-size: 12px;
@@ -313,7 +313,7 @@ body::-webkit-scrollbar-thumb:hover {
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: #5568d3;
+  border-color: #5568d3;
   transform: translateY(-1px);
 }

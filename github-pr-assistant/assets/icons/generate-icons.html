@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Generate Icons</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 { color: #333; margin-bottom: 30px; }
+    .preview {
+      display: flex;
+      gap: 30px;
+      margin: 30px 0;
+      padding: 20px;
+      background: #fafafa;
+      border-radius: 8px;
+    }
+    .icon-box {
+      text-align: center;
+    }
+    canvas {
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      background: white;
+      display: block;
+      margin-bottom: 10px;
+    }
+    button {
+      background: #6366f1;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      margin: 5px;
+    }
+    button:hover { background: #4f46e5; }
+    .download-all {
+      background: #10b981;
+      padding: 15px 30px;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+    .download-all:hover { background: #059669; }
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 6px;
+      background: #dcfce7;
+      color: #166534;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 Icon Generator</h1>
+    <p>Click "Generate Icons" to create all three PNG files</p>
+
+    <button onclick="generateAllIcons()" class="download-all">
+      ⚡ Generate All Icons
+    </button>
+
+    <div class="preview">
+      <div class="icon-box">
+        <canvas id="icon16" width="16" height="16"></canvas>
+        <p>16×16</p>
+        <button onclick="downloadIcon(16)">Download</button>
+      </div>
+      <div class="icon-box">
+        <canvas id="icon48" width="48" height="48"></canvas>
+        <p>48×48</p>
+        <button onclick="downloadIcon(48)">Download</button>
+      </div>
+      <div class="icon-box">
+        <canvas id="icon128" width="128" height="128"></canvas>
+        <p>128×128</p>
+        <button onclick="downloadIcon(128)">Download</button>
+      </div>
+    </div>
+
+    <div id="status" class="status"></div>
+  </div>
+
+  <script>
+    function drawIcon(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      const scale = size / 128;
+
+      // Clear canvas
+      ctx.clearRect(0, 0, size, size);
+
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#6366f1');
+      gradient.addColorStop(1, '#8b5cf6');
+
+      // Draw rounded rectangle background
+      const radius = 24 * scale;
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.moveTo(radius, 0);
+      ctx.lineTo(size - radius, 0);
+      ctx.arcTo(size, 0, size, radius, radius);
+      ctx.lineTo(size, size - radius);
+      ctx.arcTo(size, size, size - radius, size, radius);
+      ctx.lineTo(radius, size);
+      ctx.arcTo(0, size, 0, size - radius, radius);
+      ctx.lineTo(0, radius);
+      ctx.arcTo(0, 0, radius, 0, radius);
+      ctx.closePath();
+      ctx.fill();
+
+      // Draw code brackets
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 4 * scale;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      const centerX = size / 2;
+      const centerY = size / 2;
+      const bracketWidth = 32 * scale;
+      const bracketHeight = 56 * scale;
+
+      // Left bracket
+      ctx.beginPath();
+      ctx.moveTo(centerX - bracketWidth/2 + 8*scale, centerY - bracketHeight/2);
+      ctx.lineTo(centerX - bracketWidth/2, centerY - bracketHeight/2);
+      ctx.lineTo(centerX - bracketWidth/2, centerY + bracketHeight/2);
+      ctx.lineTo(centerX - bracketWidth/2 + 8*scale, centerY + bracketHeight/2);
+      ctx.stroke();
+
+      // Right bracket
+      ctx.beginPath();
+      ctx.moveTo(centerX + bracketWidth/2 - 8*scale, centerY - bracketHeight/2);
+      ctx.lineTo(centerX + bracketWidth/2, centerY - bracketHeight/2);
+      ctx.lineTo(centerX + bracketWidth/2, centerY + bracketHeight/2);
+      ctx.lineTo(centerX + bracketWidth/2 - 8*scale, centerY + bracketHeight/2);
+      ctx.stroke();
+
+      // Middle lines (PR diff)
+      ctx.lineWidth = 3 * scale;
+      ctx.beginPath();
+      ctx.moveTo(centerX - 16*scale, centerY - 10*scale);
+      ctx.lineTo(centerX + 16*scale, centerY - 10*scale);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(centerX - 16*scale, centerY + 10*scale);
+      ctx.lineTo(centerX + 16*scale, centerY + 10*scale);
+      ctx.stroke();
+
+      // AI Sparkle (top right)
+      const sparkleX = size * 0.75;
+      const sparkleY = size * 0.25;
+      const sparkleRadius = 8 * scale;
+
+      ctx.fillStyle = '#fbbf24';
+      ctx.beginPath();
+      ctx.arc(sparkleX, sparkleY, sparkleRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 2.5 * scale;
+      ctx.beginPath();
+      ctx.moveTo(sparkleX, sparkleY - 10*scale);
+      ctx.lineTo(sparkleX, sparkleY + 10*scale);
+      ctx.moveTo(sparkleX - 10*scale, sparkleY);
+      ctx.lineTo(sparkleX + 10*scale, sparkleY);
+      ctx.stroke();
+
+      // Checkmark (bottom right)
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 4 * scale;
+      ctx.beginPath();
+      ctx.moveTo(size * 0.67, size * 0.69);
+      ctx.lineTo(size * 0.72, size * 0.735);
+      ctx.lineTo(size * 0.80, size * 0.625);
+      ctx.stroke();
+    }
+
+    function generateAllIcons() {
+      drawIcon(document.getElementById('icon16'), 16);
+      drawIcon(document.getElementById('icon48'), 48);
+      drawIcon(document.getElementById('icon128'), 128);
+
+      document.getElementById('status').innerHTML = '✅ Icons generated! Click individual download buttons or use Download All below.';
+      document.getElementById('status').style.display = 'block';
+    }
+
+    function downloadIcon(size) {
+      const canvas = document.getElementById(`icon${size}`);
+      canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `icon${size}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    async function downloadAll() {
+      for (const size of [16, 48, 128]) {
+        downloadIcon(size);
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+      document.getElementById('status').innerHTML = '✅ All icons downloaded!';
+      document.getElementById('status').style.display = 'block';
+    }
+
+    // Add download all button
+    window.addEventListener('load', () => {
+      const btn = document.createElement('button');
+      btn.className = 'download-all';
+      btn.textContent = '⬇️ Download All 3 Icons';
+      btn.onclick = downloadAll;
+      document.querySelector('.preview').after(btn);
+    });
+  </script>
+</body>
+</html>
