@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>PR Analysis View - Screenshot</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0d1117;
+      padding: 0;
+      width: 1280px;
+      height: 800px;
+      overflow: hidden;
+    }
+
+    /* GitHub Header */
+    .gh-header {
+      background: #161b22;
+      padding: 16px 32px;
+      border-bottom: 1px solid #30363d;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .gh-logo {
+      font-size: 32px;
+    }
+    .gh-title {
+      color: #c9d1d9;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    /* Main Content */
+    .content {
+      display: flex;
+      height: calc(100% - 64px);
+    }
+
+    /* GitHub PR View */
+    .pr-section {
+      flex: 1;
+      background: #0d1117;
+      padding: 24px;
+      overflow-y: auto;
+      color: #c9d1d9;
+    }
+
+    .pr-header {
+      margin-bottom: 24px;
+    }
+
+    .pr-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #c9d1d9;
+      margin-bottom: 8px;
+    }
+
+    .pr-meta {
+      font-size: 14px;
+      color: #8b949e;
+    }
+
+    .pr-files {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .file-diff {
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .diff-line {
+      padding: 2px 8px;
+    }
+
+    .diff-add {
+      background: rgba(63, 185, 80, 0.15);
+      color: #7ee787;
+    }
+
+    .diff-remove {
+      background: rgba(248, 81, 73, 0.15);
+      color: #ffa198;
+    }
+
+    /* Extension Panel */
+    .extension-panel {
+      width: 420px;
+      background: white;
+      border-left: 1px solid #d0d7de;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .panel-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .panel-header h2 {
+      font-size: 18px;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-subtitle {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .panel-content {
+      padding: 20px;
+    }
+
+    /* AI Summary */
+    .summary-section {
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #24292f;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .summary-text {
+      background: #f6f8fa;
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #24292f;
+    }
+
+    /* Impact Score */
+    .impact-score {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 8px;
+      padding: 16px;
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    .impact-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .impact-label {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .impact-value {
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    .impact-breakdown {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .metric {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+
+    .metric-label {
+      opacity: 0.8;
+      margin-bottom: 4px;
+    }
+
+    .metric-value {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    /* Pattern Detection */
+    .pattern-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .pattern-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      background: #fff8e6;
+      border-left: 3px solid #fb8500;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .pattern-item.security {
+      background: #ffe6e6;
+      border-left-color: #cf222e;
+    }
+
+    .pattern-item.quality {
+      background: #e6f3ff;
+      border-left-color: #0969da;
+    }
+
+    .pattern-icon {
+      font-size: 16px;
+    }
+
+    .pattern-text {
+      flex: 1;
+      color: #24292f;
+    }
+
+    /* Attribution */
+    .attribution {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid #d0d7de;
+      text-align: center;
+      font-size: 11px;
+      color: #57606a;
+      font-style: italic;
+    }
+
+    /* Button */
+    .analyze-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <!-- GitHub Header -->
+  <div class="gh-header">
+    <div class="gh-logo">🐙</div>
+    <div class="gh-title">vercel/next.js - Pull Request #74299</div>
+  </div>
+
+  <div class="content">
+    <!-- GitHub PR Section -->
+    <div class="pr-section">
+      <div class="pr-header">
+        <div class="pr-title">[metadata] Change array head to single node in flight data</div>
+        <div class="pr-meta">
+          <span>huozhi wants to merge 2 commits into canary</span> •
+          <span>+77 −124</span> •
+          <span>19 files changed</span>
+        </div>
+      </div>
+
+      <div class="pr-files">
+        <div style="font-weight: 600; margin-bottom: 12px; color: #c9d1d9;">packages/next/src/server/app-render/types.ts</div>
+        <div class="file-diff">
+          <div class="diff-line diff-remove">- export type HeadData = Array&lt;ReactNode&gt; | ReactNode</div>
+          <div class="diff-line diff-add">+ export type HeadData = ReactNode</div>
+          <div class="diff-line" style="color: #8b949e;">&nbsp;</div>
+          <div class="diff-line diff-remove">- const headData: HeadData = []</div>
+          <div class="diff-line diff-add">+ const headData: HeadData = null</div>
+        </div>
+      </div>
+
+      <div class="pr-files">
+        <div style="font-weight: 600; margin-bottom: 12px; color: #c9d1d9;">packages/next/src/client/components/layout-router.tsx</div>
+        <div class="file-diff">
+          <div class="diff-line diff-remove">- if (Array.isArray(headData)) {</div>
+          <div class="diff-line diff-remove">-   return headData.map((node, i) =&gt; ...)</div>
+          <div class="diff-line diff-remove">- }</div>
+          <div class="diff-line diff-add">+ return headData</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Extension Panel -->
+    <div class="extension-panel">
+      <div class="panel-header">
+        <h2>🤖 AI Analysis</h2>
+        <div class="panel-subtitle">Powered by ChatGPT</div>
+      </div>
+
+      <div class="panel-content">
+        <button class="analyze-btn">✨ Re-analyze PR</button>
+
+        <!-- Impact Score -->
+        <div class="impact-score">
+          <div class="impact-header">
+            <div class="impact-label">Impact Score</div>
+            <div class="impact-value">7.8</div>
+          </div>
+          <div style="font-size: 11px; opacity: 0.9;">HIGH IMPACT</div>
+          <div class="impact-breakdown">
+            <div class="metric">
+              <div class="metric-label">Complexity</div>
+              <div class="metric-value">8.2</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Risk</div>
+              <div class="metric-value">7.5</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Test Coverage</div>
+              <div class="metric-value">6.8</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Scope</div>
+              <div class="metric-value">8.5</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Summary -->
+        <div class="summary-section">
+          <div class="section-title">📝 Summary</div>
+          <div class="summary-text">
+            <strong>Key Changes:</strong> Simplifies HeadData type from array to single ReactNode, removing array handling complexity throughout the codebase.
+            <br><br>
+            <strong>Impact:</strong> Affects 19 files across server rendering and client components. Changes flight data structure and metadata handling.
+            <br><br>
+            <strong>Risk Assessment:</strong> Medium-high risk due to core type change. Requires thorough testing of metadata rendering in various scenarios.
+          </div>
+        </div>
+
+        <!-- Pattern Detection -->
+        <div class="summary-section">
+          <div class="section-title">🔍 Detected Patterns</div>
+          <div class="pattern-list">
+            <div class="pattern-item security">
+              <div class="pattern-icon">🛡️</div>
+              <div class="pattern-text">
+                <strong>Type Safety Improvement</strong><br>
+                Reduces type complexity, easier to maintain
+              </div>
+            </div>
+            <div class="pattern-item quality">
+              <div class="pattern-icon">✨</div>
+              <div class="pattern-text">
+                <strong>Code Simplification</strong><br>
+                Removes array handling logic (-47 lines)
+              </div>
+            </div>
+            <div class="pattern-item">
+              <div class="pattern-icon">⚡</div>
+              <div class="pattern-text">
+                <strong>Breaking Change</strong><br>
+                Core type change may affect dependent code
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="attribution">
+          Powered by ChatGPT
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

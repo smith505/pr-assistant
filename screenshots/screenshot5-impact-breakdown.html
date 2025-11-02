@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Impact Score Breakdown - Screenshot</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0d1117;
+      padding: 0;
+      width: 1280px;
+      height: 800px;
+      overflow: hidden;
+      display: flex;
+    }
+
+    /* Left: PR Info */
+    .pr-info {
+      flex: 1;
+      background: #0d1117;
+      padding: 32px;
+      color: #c9d1d9;
+    }
+
+    .pr-header {
+      margin-bottom: 32px;
+    }
+
+    .pr-title {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #c9d1d9;
+    }
+
+    .pr-meta {
+      font-size: 14px;
+      color: #8b949e;
+      line-height: 1.8;
+    }
+
+    .pr-meta-item {
+      margin: 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pr-meta-icon {
+      font-size: 16px;
+    }
+
+    /* Changes Summary */
+    .changes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 32px;
+    }
+
+    .change-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .change-value {
+      font-size: 36px;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 8px;
+    }
+
+    .change-label {
+      font-size: 13px;
+      color: #8b949e;
+    }
+
+    /* Right: Impact Analysis */
+    .impact-panel {
+      width: 480px;
+      background: white;
+      border-left: 1px solid #d0d7de;
+      overflow-y: auto;
+    }
+
+    .panel-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 24px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .panel-header h2 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .panel-subtitle {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .panel-content {
+      padding: 24px;
+    }
+
+    /* Overall Score */
+    .overall-score {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      color: white;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .score-label {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 12px;
+    }
+
+    .score-value {
+      font-size: 64px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+
+    .score-rating {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    /* Metric Cards */
+    .metrics-section {
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #24292f;
+      margin-bottom: 16px;
+    }
+
+    .metric-card {
+      background: #f6f8fa;
+      border: 1px solid #d0d7de;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .metric-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .metric-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #24292f;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .metric-icon {
+      font-size: 18px;
+    }
+
+    .metric-score {
+      font-size: 24px;
+      font-weight: 700;
+      color: #667eea;
+    }
+
+    .metric-bar {
+      width: 100%;
+      height: 8px;
+      background: #eaeef2;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .metric-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    .metric-description {
+      font-size: 12px;
+      color: #57606a;
+      line-height: 1.5;
+    }
+
+    /* Factors List */
+    .factors-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .factor-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: #f6f8fa;
+      border-radius: 6px;
+      border-left: 3px solid #667eea;
+    }
+
+    .factor-icon {
+      font-size: 20px;
+    }
+
+    .factor-content {
+      flex: 1;
+    }
+
+    .factor-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #24292f;
+      margin-bottom: 2px;
+    }
+
+    .factor-detail {
+      font-size: 12px;
+      color: #57606a;
+    }
+
+    /* Attribution */
+    .attribution {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid #d0d7de;
+      text-align: center;
+      font-size: 11px;
+      color: #57606a;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <!-- PR Info Section -->
+  <div class="pr-info">
+    <div class="pr-header">
+      <div class="pr-title">
+        [metadata] Change array head to single node in flight data
+      </div>
+      <div class="pr-meta">
+        <div class="pr-meta-item">
+          <span class="pr-meta-icon">👤</span>
+          <span>huozhi → canary</span>
+        </div>
+        <div class="pr-meta-item">
+          <span class="pr-meta-icon">📝</span>
+          <span>2 commits • 19 files changed</span>
+        </div>
+        <div class="pr-meta-item">
+          <span class="pr-meta-icon">📊</span>
+          <span>+77 additions, -124 deletions</span>
+        </div>
+        <div class="pr-meta-item">
+          <span class="pr-meta-icon">✅</span>
+          <span>130 checks passed</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="changes-grid">
+      <div class="change-card">
+        <div class="change-value">19</div>
+        <div class="change-label">Files Modified</div>
+      </div>
+      <div class="change-card">
+        <div class="change-value">+77</div>
+        <div class="change-label">Lines Added</div>
+      </div>
+      <div class="change-card">
+        <div class="change-value">-124</div>
+        <div class="change-label">Lines Removed</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 40px; background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px;">
+      <div style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">📝 AI Summary</div>
+      <div style="font-size: 14px; line-height: 1.6; color: #8b949e;">
+        <strong style="color: #c9d1d9;">Key Changes:</strong> Simplifies HeadData type from array to single ReactNode, removing complex array handling throughout the server rendering pipeline.
+        <br><br>
+        <strong style="color: #c9d1d9;">Impact:</strong> Affects core rendering infrastructure across 19 files. Changes fundamental data structure used in flight data serialization.
+        <br><br>
+        <strong style="color: #c9d1d9;">Risk:</strong> Medium-high due to core type modification. Requires comprehensive testing of metadata rendering scenarios.
+      </div>
+    </div>
+  </div>
+
+  <!-- Impact Panel -->
+  <div class="impact-panel">
+    <div class="panel-header">
+      <h2>🎯 Impact Score Analysis</h2>
+      <div class="panel-subtitle">AI-powered risk assessment</div>
+    </div>
+
+    <div class="panel-content">
+      <!-- Overall Score -->
+      <div class="overall-score">
+        <div class="score-label">Overall Impact Score</div>
+        <div class="score-value">7.8</div>
+        <div class="score-rating">HIGH IMPACT</div>
+      </div>
+
+      <!-- Detailed Metrics -->
+      <div class="metrics-section">
+        <div class="section-title">🔍 Detailed Metrics</div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-name">
+              <span class="metric-icon">🧩</span>
+              Code Complexity
+            </div>
+            <div class="metric-score">8.2</div>
+          </div>
+          <div class="metric-bar">
+            <div class="metric-bar-fill" style="width: 82%"></div>
+          </div>
+          <div class="metric-description">
+            Type system changes affect multiple components. Complex refactoring across server and client code.
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-name">
+              <span class="metric-icon">⚠️</span>
+              Risk Level
+            </div>
+            <div class="metric-score">7.5</div>
+          </div>
+          <div class="metric-bar">
+            <div class="metric-bar-fill" style="width: 75%"></div>
+          </div>
+          <div class="metric-description">
+            Core data structure modification. Breaking change potential. Requires careful migration testing.
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-name">
+              <span class="metric-icon">🧪</span>
+              Test Coverage
+            </div>
+            <div class="metric-score">6.8</div>
+          </div>
+          <div class="metric-bar">
+            <div class="metric-bar-fill" style="width: 68%"></div>
+          </div>
+          <div class="metric-description">
+            Good test coverage, but edge cases in metadata rendering need additional validation.
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <div class="metric-name">
+              <span class="metric-icon">📐</span>
+              Scope
+            </div>
+            <div class="metric-score">8.5</div>
+          </div>
+          <div class="metric-bar">
+            <div class="metric-bar-fill" style="width: 85%"></div>
+          </div>
+          <div class="metric-description">
+            Wide scope affecting 19 files across server rendering, client components, and type definitions.
+          </div>
+        </div>
+      </div>
+
+      <!-- Key Factors -->
+      <div class="metrics-section">
+        <div class="section-title">⚡ Key Impact Factors</div>
+        <div class="factors-list">
+          <div class="factor-item">
+            <div class="factor-icon">🏗️</div>
+            <div class="factor-content">
+              <div class="factor-label">Architecture Change</div>
+              <div class="factor-detail">Fundamental type system modification</div>
+            </div>
+          </div>
+          <div class="factor-item">
+            <div class="factor-icon">🔄</div>
+            <div class="factor-content">
+              <div class="factor-label">Breaking Change</div>
+              <div class="factor-detail">May affect downstream dependencies</div>
+            </div>
+          </div>
+          <div class="factor-item">
+            <div class="factor-icon">⚙️</div>
+            <div class="factor-content">
+              <div class="factor-label">Server Rendering</div>
+              <div class="factor-detail">Core rendering pipeline affected</div>
+            </div>
+          </div>
+          <div class="factor-item">
+            <div class="factor-icon">📦</div>
+            <div class="factor-content">
+              <div class="factor-label">Flight Data</div>
+              <div class="factor-detail">Serialization format changes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="attribution">
+        Powered by ChatGPT
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,18 @@
+# Environment variables with API keys
+.env
+.env.local
+.env.production
+
+# Database (will be created fresh on Railway)
+database.sqlite
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db

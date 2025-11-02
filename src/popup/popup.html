@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub PR Assistant</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Auth Section (shown when not logged in) -->
+    <div id="auth-section" class="auth-section" style="display: none;">
+      <header>
+        <h1>🤖 PR Review Assistant</h1>
+        <p class="subtitle">AI-Powered Code Review</p>
+      </header>
+
+      <div class="auth-tabs">
+        <button id="tab-login" class="tab-btn active">Login</button>
+        <button id="tab-register" class="tab-btn">Register</button>
+      </div>
+
+      <!-- Login Form -->
+      <div id="login-form" class="auth-form">
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" required>
+        </div>
+        <button id="btn-login" class="btn-primary">Login</button>
+        <div id="login-error" class="error-message"></div>
+      </div>
+
+      <!-- Register Form -->
+      <div id="register-form" class="auth-form" style="display: none;">
+        <div class="form-group">
+          <label for="register-email">Email</label>
+          <input type="email" id="register-email" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="register-password">Password</label>
+          <input type="password" id="register-password" placeholder="••••••••" required>
+        </div>
+        <div class="form-group">
+          <label for="register-password-confirm">Confirm Password</label>
+          <input type="password" id="register-password-confirm" placeholder="••••••••" required>
+        </div>
+        <button id="btn-register" class="btn-primary">Create Account</button>
+        <div id="register-error" class="error-message"></div>
+      </div>
+
+      <div class="auth-footer">
+        <p class="auth-note">Start with 5 free PR analyses per month</p>
+      </div>
+    </div>
+
+    <!-- Main Dashboard (shown when logged in) -->
+    <div id="dashboard-section" style="display: none;">
+      <header>
+        <h1>🤖 PR Review Assistant</h1>
+        <p class="subtitle">Analytics Dashboard</p>
+      </header>
+
+      <!-- User Info -->
+      <div class="section user-info">
+        <div class="user-details">
+          <div class="user-email" id="user-email">Loading...</div>
+          <div class="user-tier" id="user-tier">Free</div>
+        </div>
+        <button id="btn-logout" class="btn-link">Logout</button>
+      </div>
+
+      <!-- Premium Upgrade Banner (only for free tier) -->
+      <div id="premium-banner" class="premium-banner" style="display: none;">
+        <div class="premium-content">
+          <div class="premium-icon">✨</div>
+          <div class="premium-text">
+            <div class="premium-title">Upgrade to Pro</div>
+            <div class="premium-subtitle">Unlimited PR analyses • Advanced metrics</div>
+          </div>
+          <button id="btn-premium" class="btn-premium">$9/mo</button>
+        </div>
+      </div>
+
+      <!-- Usage Stats -->
+      <div class="section usage-section">
+        <h2>📊 Monthly Usage</h2>
+        <div class="usage-bar-container">
+          <div class="usage-info">
+            <span id="usage-current">0</span>
+            <span class="usage-separator">/</span>
+            <span id="usage-limit">5</span>
+            <span class="usage-label">PR analyses</span>
+          </div>
+          <div class="usage-bar-track">
+            <div id="usage-bar-fill" class="usage-bar-fill" style="width: 0%"></div>
+          </div>
+        </div>
+        <div id="upgrade-prompt" class="upgrade-prompt" style="display: none;">
+          <p>⚠️ Usage limit reached!</p>
+          <button id="btn-upgrade" class="btn-primary btn-small">Upgrade to Pro</button>
+        </div>
+      </div>
+
+      <!-- Overall Stats -->
+      <div class="section">
+        <h2>📈 Statistics</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">📋</div>
+            <div class="stat-content">
+              <div class="stat-value" id="total-analyzed">0</div>
+              <div class="stat-label">PRs Analyzed</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">⏱️</div>
+            <div class="stat-content">
+              <div class="stat-value" id="time-saved">0h</div>
+              <div class="stat-label">Time Saved</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-content">
+              <div class="stat-value" id="avg-impact">-</div>
+              <div class="stat-label">Avg Impact</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🔥</div>
+            <div class="stat-content">
+              <div class="stat-value" id="critical-count">0</div>
+              <div class="stat-label">High Impact</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- This Week -->
+      <div class="section">
+        <h2>📅 This Week</h2>
+        <div class="week-stats">
+          <div class="week-stat">
+            <span class="week-label">✅ Analyzed:</span>
+            <span class="week-value" id="week-analyzed">0</span>
+          </div>
+          <div class="week-stat">
+            <span class="week-label">⚠️ High Impact:</span>
+            <span class="week-value" id="week-high-impact">0</span>
+          </div>
+          <div class="week-stat">
+            <span class="week-label">🛡️ Security Issues:</span>
+            <span class="week-value" id="week-security">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Impact Distribution -->
+      <div class="section">
+        <h2>⚡ Impact Distribution</h2>
+        <div class="impact-bars">
+          <div class="impact-bar-row">
+            <span class="impact-label">Critical</span>
+            <div class="impact-bar-track">
+              <div class="impact-bar-fill critical" id="bar-critical" style="width: 0%"></div>
+            </div>
+            <span class="impact-count" id="count-critical">0</span>
+          </div>
+          <div class="impact-bar-row">
+            <span class="impact-label">High</span>
+            <div class="impact-bar-track">
+              <div class="impact-bar-fill high" id="bar-high" style="width: 0%"></div>
+            </div>
+            <span class="impact-count" id="count-high">0</span>
+          </div>
+          <div class="impact-bar-row">
+            <span class="impact-label">Medium</span>
+            <div class="impact-bar-track">
+              <div class="impact-bar-fill medium" id="bar-medium" style="width: 0%"></div>
+            </div>
+            <span class="impact-count" id="count-medium">0</span>
+          </div>
+          <div class="impact-bar-row">
+            <span class="impact-label">Low</span>
+            <div class="impact-bar-track">
+              <div class="impact-bar-fill low" id="bar-low" style="width: 0%"></div>
+            </div>
+            <span class="impact-count" id="count-low">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div class="section">
+        <h2>⚙️ Settings</h2>
+        <label class="checkbox-label">
+          <input type="checkbox" id="auto-analyze">
+          <span>Auto-analyze PRs on page load</span>
+        </label>
+      </div>
+
+      <footer>
+        <button id="reset-stats" class="btn-link">Reset Statistics</button>
+      </footer>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

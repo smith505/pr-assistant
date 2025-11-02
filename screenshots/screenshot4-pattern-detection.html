@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Pattern Detection - Screenshot</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0d1117;
+      padding: 0;
+      width: 1280px;
+      height: 800px;
+      overflow: hidden;
+      display: flex;
+    }
+
+    /* Left: Code View */
+    .code-section {
+      flex: 1;
+      background: #0d1117;
+      padding: 24px;
+      overflow-y: auto;
+      color: #c9d1d9;
+    }
+
+    .file-header {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 6px 6px 0 0;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #c9d1d9;
+      margin-bottom: 0;
+    }
+
+    .code-container {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      padding: 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      position: relative;
+    }
+
+    .code-line {
+      position: relative;
+      padding: 2px 8px;
+      border-left: 3px solid transparent;
+    }
+
+    .line-number {
+      display: inline-block;
+      width: 40px;
+      color: #6e7681;
+      user-select: none;
+      text-align: right;
+      margin-right: 16px;
+    }
+
+    /* Highlighted Lines */
+    .highlight-security {
+      background: rgba(248, 81, 73, 0.15);
+      border-left-color: #cf222e;
+    }
+
+    .highlight-quality {
+      background: rgba(47, 129, 247, 0.15);
+      border-left-color: #0969da;
+    }
+
+    .highlight-performance {
+      background: rgba(251, 133, 0, 0.15);
+      border-left-color: #fb8500;
+    }
+
+    /* Pattern Indicators */
+    .pattern-indicator {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      font-family: -apple-system, sans-serif;
+    }
+
+    .indicator-security {
+      background: rgba(248, 81, 73, 0.2);
+      color: #ff7b72;
+      border: 1px solid rgba(248, 81, 73, 0.3);
+    }
+
+    .indicator-quality {
+      background: rgba(47, 129, 247, 0.2);
+      color: #79c0ff;
+      border: 1px solid rgba(47, 129, 247, 0.3);
+    }
+
+    .indicator-performance {
+      background: rgba(251, 133, 0, 0.2);
+      color: #ffa657;
+      border: 1px solid rgba(251, 133, 0, 0.3);
+    }
+
+    /* Right: Pattern Panel */
+    .pattern-panel {
+      width: 380px;
+      background: white;
+      border-left: 1px solid #d0d7de;
+      overflow-y: auto;
+    }
+
+    .panel-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .panel-header h2 {
+      font-size: 18px;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-subtitle {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .panel-content {
+      padding: 20px;
+    }
+
+    /* Pattern Cards */
+    .pattern-card {
+      background: white;
+      border: 1px solid #d0d7de;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .pattern-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .pattern-icon {
+      font-size: 24px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+    }
+
+    .pattern-icon.security {
+      background: rgba(248, 81, 73, 0.1);
+    }
+
+    .pattern-icon.quality {
+      background: rgba(47, 129, 247, 0.1);
+    }
+
+    .pattern-icon.performance {
+      background: rgba(251, 133, 0, 0.1);
+    }
+
+    .pattern-title {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 600;
+      color: #24292f;
+    }
+
+    .pattern-severity {
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .severity-high {
+      background: rgba(248, 81, 73, 0.15);
+      color: #cf222e;
+    }
+
+    .severity-medium {
+      background: rgba(251, 133, 0, 0.15);
+      color: #fb8500;
+    }
+
+    .severity-low {
+      background: rgba(47, 129, 247, 0.15);
+      color: #0969da;
+    }
+
+    .pattern-description {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #57606a;
+      margin-bottom: 10px;
+    }
+
+    .pattern-location {
+      font-size: 12px;
+      color: #0969da;
+      font-family: 'Courier New', monospace;
+      background: #f6f8fa;
+      padding: 6px 10px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    /* Summary Stats */
+    .summary-stats {
+      background: #f6f8fa;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      display: block;
+    }
+
+    .stat-value.security { color: #cf222e; }
+    .stat-value.quality { color: #0969da; }
+    .stat-value.performance { color: #fb8500; }
+
+    .stat-label {
+      font-size: 11px;
+      color: #57606a;
+      margin-top: 4px;
+    }
+
+    /* Attribution */
+    .attribution {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid #d0d7de;
+      text-align: center;
+      font-size: 11px;
+      color: #57606a;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <!-- Code Section -->
+  <div class="code-section">
+    <div class="file-header">
+      src/auth/auth-service.ts
+    </div>
+    <div class="code-container">
+      <div class="code-line">
+        <span class="line-number">1</span><span style="color: #ff7b72;">import</span> <span style="color: #a5d6ff;">crypto</span> <span style="color: #ff7b72;">from</span> <span style="color: #a5d6ff;">'crypto'</span>;
+      </div>
+      <div class="code-line">
+        <span class="line-number">2</span><span style="color: #ff7b72;">import</span> <span style="color: #a5d6ff;">jwt</span> <span style="color: #ff7b72;">from</span> <span style="color: #a5d6ff;">'jsonwebtoken'</span>;
+      </div>
+      <div class="code-line">
+        <span class="line-number">3</span>
+      </div>
+      <div class="code-line highlight-security">
+        <span class="line-number">4</span><span style="color: #ff7b72;">const</span> <span style="color: #d2a8ff;">SECRET_KEY</span> = <span style="color: #a5d6ff;">'hardcoded-secret-key-123'</span>;
+        <span class="pattern-indicator indicator-security">🛡️ SECURITY</span>
+      </div>
+      <div class="code-line">
+        <span class="line-number">5</span>
+      </div>
+      <div class="code-line">
+        <span class="line-number">6</span><span style="color: #ff7b72;">export</span> <span style="color: #ff7b72;">class</span> <span style="color: #d2a8ff;">AuthService</span> {
+      </div>
+      <div class="code-line highlight-quality">
+        <span class="line-number">7</span>  <span style="color: #d2a8ff;">generateToken</span>(<span style="color: #ffa657;">userId</span>: <span style="color: #79c0ff;">string</span>) {
+        <span class="pattern-indicator indicator-quality">✨ QUALITY</span>
+      </div>
+      <div class="code-line">
+        <span class="line-number">8</span>    <span style="color: #ff7b72;">return</span> jwt.<span style="color: #d2a8ff;">sign</span>({ userId }, SECRET_KEY);
+      </div>
+      <div class="code-line">
+        <span class="line-number">9</span>  }
+      </div>
+      <div class="code-line">
+        <span class="line-number">10</span>
+      </div>
+      <div class="code-line highlight-security">
+        <span class="line-number">11</span>  <span style="color: #d2a8ff;">verifyToken</span>(<span style="color: #ffa657;">token</span>: <span style="color: #79c0ff;">string</span>) {
+        <span class="pattern-indicator indicator-security">🛡️ SECURITY</span>
+      </div>
+      <div class="code-line highlight-security">
+        <span class="line-number">12</span>    <span style="color: #ff7b72;">return</span> jwt.<span style="color: #d2a8ff;">verify</span>(token, SECRET_KEY);
+      </div>
+      <div class="code-line">
+        <span class="line-number">13</span>  }
+      </div>
+      <div class="code-line">
+        <span class="line-number">14</span>
+      </div>
+      <div class="code-line highlight-performance">
+        <span class="line-number">15</span>  <span style="color: #d2a8ff;">hashPassword</span>(<span style="color: #ffa657;">password</span>: <span style="color: #79c0ff;">string</span>) {
+        <span class="pattern-indicator indicator-performance">⚡ PERFORMANCE</span>
+      </div>
+      <div class="code-line highlight-performance">
+        <span class="line-number">16</span>    <span style="color: #ff7b72;">return</span> crypto.<span style="color: #d2a8ff;">createHash</span>(<span style="color: #a5d6ff;">'md5'</span>).<span style="color: #d2a8ff;">update</span>(password).<span style="color: #d2a8ff;">digest</span>(<span style="color: #a5d6ff;">'hex'</span>);
+      </div>
+      <div class="code-line">
+        <span class="line-number">17</span>  }
+      </div>
+      <div class="code-line">
+        <span class="line-number">18</span>
+      </div>
+      <div class="code-line highlight-quality">
+        <span class="line-number">19</span>  <span style="color: #d2a8ff;">authenticate</span>(<span style="color: #ffa657;">username</span>, <span style="color: #ffa657;">password</span>) {
+        <span class="pattern-indicator indicator-quality">✨ QUALITY</span>
+      </div>
+      <div class="code-line">
+        <span class="line-number">20</span>    <span style="color: #8b949e;">// Missing input validation</span>
+      </div>
+      <div class="code-line">
+        <span class="line-number">21</span>    <span style="color: #ff7b72;">const</span> hashedPassword = <span style="color: #ff7b72;">this</span>.<span style="color: #d2a8ff;">hashPassword</span>(password);
+      </div>
+      <div class="code-line">
+        <span class="line-number">22</span>    <span style="color: #8b949e;">// ... authentication logic</span>
+      </div>
+      <div class="code-line">
+        <span class="line-number">23</span>  }
+      </div>
+      <div class="code-line">
+        <span class="line-number">24</span>}
+      </div>
+    </div>
+  </div>
+
+  <!-- Pattern Panel -->
+  <div class="pattern-panel">
+    <div class="panel-header">
+      <h2>🔍 Pattern Detection</h2>
+      <div class="panel-subtitle">AI-powered code analysis</div>
+    </div>
+
+    <div class="panel-content">
+      <!-- Summary Stats -->
+      <div class="summary-stats">
+        <div class="stat">
+          <span class="stat-value security">2</span>
+          <div class="stat-label">Security</div>
+        </div>
+        <div class="stat">
+          <span class="stat-value quality">2</span>
+          <div class="stat-label">Quality</div>
+        </div>
+        <div class="stat">
+          <span class="stat-value performance">1</span>
+          <div class="stat-label">Performance</div>
+        </div>
+      </div>
+
+      <!-- Security Patterns -->
+      <div class="pattern-card">
+        <div class="pattern-header">
+          <div class="pattern-icon security">🛡️</div>
+          <div class="pattern-title">Hardcoded Secret Key</div>
+          <span class="pattern-severity severity-high">HIGH</span>
+        </div>
+        <div class="pattern-description">
+          Secret key is hardcoded in source code. This is a critical security vulnerability. Use environment variables or secure key management.
+        </div>
+        <div class="pattern-location">Line 4: SECRET_KEY constant</div>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-header">
+          <div class="pattern-icon security">🛡️</div>
+          <div class="pattern-title">Weak Hash Algorithm</div>
+          <span class="pattern-severity severity-high">HIGH</span>
+        </div>
+        <div class="pattern-description">
+          MD5 is cryptographically broken and unsuitable for password hashing. Use bcrypt, scrypt, or Argon2 instead.
+        </div>
+        <div class="pattern-location">Line 16: crypto.createHash('md5')</div>
+      </div>
+
+      <!-- Quality Patterns -->
+      <div class="pattern-card">
+        <div class="pattern-header">
+          <div class="pattern-icon quality">✨</div>
+          <div class="pattern-title">Missing Type Annotations</div>
+          <span class="pattern-severity severity-medium">MEDIUM</span>
+        </div>
+        <div class="pattern-description">
+          Function parameters missing explicit type annotations. Add types for better IDE support and type safety.
+        </div>
+        <div class="pattern-location">Line 19: authenticate(username, password)</div>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-header">
+          <div class="pattern-icon quality">✨</div>
+          <div class="pattern-title">Missing Input Validation</div>
+          <span class="pattern-severity severity-high">HIGH</span>
+        </div>
+        <div class="pattern-description">
+          No validation of username and password inputs. Add checks for null, undefined, and malicious input.
+        </div>
+        <div class="pattern-location">Line 19-23: authenticate method</div>
+      </div>
+
+      <div class="attribution">
+        Powered by ChatGPT
+      </div>
+    </div>
+  </div>
+</body>
+</html>
