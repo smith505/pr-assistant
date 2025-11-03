@@ -6,7 +6,7 @@ const databaseModule = process.env.DATABASE_URL ? '../database' : '../database-s
 const { getUserByToken, getMonthlyUsage } = require(databaseModule);
 
 // Verify API token from request headers
-function verifyToken(req, res, next) {
+async function verifyToken(req, res, next) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -17,7 +17,7 @@ function verifyToken(req, res, next) {
   }
 
   const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-  const user = getUserByToken(token);
+  const user = await getUserByToken(token);
 
   if (!user) {
     return res.status(401).json({
@@ -32,9 +32,9 @@ function verifyToken(req, res, next) {
 }
 
 // Check usage limits based on user tier
-function checkUsageLimit(req, res, next) {
+async function checkUsageLimit(req, res, next) {
   const user = req.user;
-  const monthlyUsage = getMonthlyUsage(user.id);
+  const monthlyUsage = await getMonthlyUsage(user.id);
 
   // Pro and Team tiers have unlimited usage
   if (user.tier === 'pro' || user.tier === 'team') {
@@ -72,7 +72,7 @@ function checkUsageLimit(req, res, next) {
 }
 
 // Optional auth - doesn't fail if no token provided
-function optionalAuth(req, res, next) {
+async function optionalAuth(req, res, next) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -80,7 +80,7 @@ function optionalAuth(req, res, next) {
   }
 
   const token = authHeader.substring(7);
-  const user = getUserByToken(token);
+  const user = await getUserByToken(token);
 
   if (user) {
     req.user = user;
