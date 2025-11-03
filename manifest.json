@@ -11,8 +11,7 @@
   "host_permissions": [
     "https://github.com/*",
     "https://api.github.com/*",
-    "https://api.openai.com/*",
-    "http://localhost:3001/*"
+    "https://pr-assistant-production.up.railway.app/*"
   ],
   "background": {
     "service_worker": "src/scripts/background.js"

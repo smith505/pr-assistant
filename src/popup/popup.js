@@ -280,19 +280,9 @@ async function loadUserData(apiToken) {
     }
 
     const data = await response.json();
-    console.log('User data loaded:', data); // Debug log
 
     // Update user info
-    const emailElement = document.getElementById('user-email');
-    console.log('Email element:', emailElement); // Debug log
-    console.log('Setting email to:', data.user.email); // Debug log
-
-    if (emailElement) {
-      emailElement.textContent = data.user.email;
-    } else {
-      console.error('user-email element not found!');
-    }
-
+    document.getElementById('user-email').textContent = data.user.email;
     document.getElementById('user-tier').textContent = data.user.tier.toUpperCase();
 
     // Update usage stats
