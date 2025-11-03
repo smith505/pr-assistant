@@ -158,4 +158,65 @@ router.get('/verify', verifyToken, (req, res) => {
   });
 });
 
+// Admin endpoint to manually upgrade user to Pro (for testing/manual upgrades)
+router.post('/upgrade-to-pro', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        error: 'Missing email',
+        message: 'Email address is required'
+      });
+    }
+
+    const user = getUserByEmail(email);
+    if (!user) {
+      return res.status(404).json({
+        error: 'User not found',
+        message: `No user found with email: ${email}`
+      });
+    }
+
+    // Import database function
+    const { db } = require('../database');
+
+    // Calculate expiration (1 year from now)
+    const activeUntil = new Date();
+    activeUntil.setFullYear(activeUntil.getFullYear() + 1);
+
+    // Update user to Pro tier
+    const stmt = db.prepare(`
+      UPDATE users
+      SET tier = ?, active_until = ?
+      WHERE id = ?
+    `);
+
+    stmt.run('pro', activeUntil.toISOString(), user.id);
+
+    // Get updated user stats
+    const stats = getUserStats(user.id);
+
+    res.json({
+      success: true,
+      message: 'User upgraded to Pro tier successfully',
+      user: {
+        id: user.id,
+        email: user.email,
+        tier: 'pro',
+        activeUntil: activeUntil.toISOString(),
+        monthlyUsage: stats.monthlyUsage,
+        limit: stats.limit
+      }
+    });
+
+  } catch (error) {
+    console.error('Upgrade error:', error);
+    res.status(500).json({
+      error: 'Upgrade failed',
+      message: 'An error occurred while upgrading user'
+    });
+  }
+});
+
 module.exports = router;
