@@ -170,7 +170,7 @@ router.post('/upgrade-to-pro', async (req, res) => {
       });
     }
 
-    const user = getUserByEmail(email);
+    const user = await getUserByEmail(email);
     if (!user) {
       return res.status(404).json({
         error: 'User not found',
@@ -178,24 +178,21 @@ router.post('/upgrade-to-pro', async (req, res) => {
       });
     }
 
-    // Import database function
-    const { db } = require('../database');
+    // Import database pool
+    const { pool } = require('../database');
 
     // Calculate expiration (1 year from now)
     const activeUntil = new Date();
     activeUntil.setFullYear(activeUntil.getFullYear() + 1);
 
-    // Update user to Pro tier
-    const stmt = db.prepare(`
-      UPDATE users
-      SET tier = ?, active_until = ?
-      WHERE id = ?
-    `);
-
-    stmt.run('pro', activeUntil.toISOString(), user.id);
+    // Update user to Pro tier (PostgreSQL syntax)
+    await pool.query(
+      'UPDATE users SET tier = $1, active_until = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3',
+      ['pro', activeUntil, user.id]
+    );
 
     // Get updated user stats
-    const stats = getUserStats(user.id);
+    const stats = await getUserStats(user.id);
 
     res.json({
       success: true,
@@ -215,6 +212,47 @@ router.post('/upgrade-to-pro', async (req, res) => {
     res.status(500).json({
       error: 'Upgrade failed',
       message: 'An error occurred while upgrading user'
+    });
+  }
+});
+
+// Admin endpoint to delete a user (for cleaning up broken records)
+router.post('/delete-user', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        error: 'Missing email',
+        message: 'Email address is required'
+      });
+    }
+
+    const { pool } = require('../database');
+
+    // Delete in correct order (foreign key constraints)
+    await pool.query('DELETE FROM usage WHERE user_id IN (SELECT id FROM users WHERE email = $1)', [email]);
+    await pool.query('DELETE FROM subscriptions WHERE user_id IN (SELECT id FROM users WHERE email = $1)', [email]);
+    const result = await pool.query('DELETE FROM users WHERE email = $1 RETURNING email', [email]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: 'User not found',
+        message: `No user found with email: ${email}`
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'User deleted successfully',
+      email: result.rows[0].email
+    });
+
+  } catch (error) {
+    console.error('Delete user error:', error);
+    res.status(500).json({
+      error: 'Delete failed',
+      message: 'An error occurred while deleting user'
     });
   }
 });
