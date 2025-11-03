@@ -45,6 +45,10 @@ app.use((req, res, next) => {
 // Initialize database
 initializeDatabase();
 
+// Serve static files (privacy policy, etc.)
+const path = require('path');
+app.use(express.static(path.join(__dirname, '..', 'public')));
+
 // Routes
 const authRoutes = require('./routes/auth');
 const prRoutes = require('./routes/pr');
