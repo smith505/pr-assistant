@@ -1,5 +1,5 @@
 // GitHub PR Assistant - Popup Script
-const BACKEND_URL = 'http://localhost:3001';
+const BACKEND_URL = 'https://pr-assistant-production.up.railway.app';
 
 // DOM Elements - Auth
 const authSection = document.getElementById('auth-section');

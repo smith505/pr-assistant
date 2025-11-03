@@ -16,7 +16,7 @@ const CONFIG = {
     apiBase: 'https://api.github.com'
   },
   backend: {
-    apiUrl: 'http://localhost:3001', // Backend API URL
+    apiUrl: 'https://pr-assistant-production.up.railway.app', // Backend API URL
     apiToken: '' // User's API token (loaded from storage)
   },
   features: {

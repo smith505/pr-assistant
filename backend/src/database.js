@@ -21,10 +21,18 @@ function initializeDatabase() {
       api_token TEXT UNIQUE NOT NULL,
       tier TEXT DEFAULT 'free' CHECK(tier IN ('free', 'pro', 'team')),
       stripe_customer_id TEXT,
+      active_until DATETIME,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  // Add active_until column if it doesn't exist (for existing databases)
+  try {
+    db.exec(`ALTER TABLE users ADD COLUMN active_until DATETIME`);
+  } catch (e) {
+    // Column already exists, ignore error
+  }
 
   // Usage tracking table
   db.exec(`

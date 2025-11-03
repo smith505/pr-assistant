@@ -50,7 +50,7 @@ const STRIPE_CONFIG = {
   checkoutSuccessUrl: chrome.runtime.getURL('src/pages/checkout-success.html'),
   checkoutCancelUrl: chrome.runtime.getURL('src/pages/checkout-cancel.html'),
   customerPortalUrl: 'https://billing.stripe.com/p/login/test_placeholder', // Will update after first customer
-  backendUrl: 'http://localhost:3001' // Will update to production URL after deployment
+  backendUrl: 'https://pr-assistant-production.up.railway.app' // Will update to production URL after deployment
 };
 
 // Initialize subscription system
