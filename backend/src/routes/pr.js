@@ -2,7 +2,10 @@
 const express = require('express');
 const OpenAI = require('openai');
 const { verifyToken, checkUsageLimit } = require('../middleware/auth');
-const { recordUsage, getUserStats } = require('../database');
+
+// Use PostgreSQL for production (Railway), SQLite for local development
+const databaseModule = process.env.DATABASE_URL ? '../database' : '../database-sqlite';
+const { recordUsage, getUserStats } = require(databaseModule);
 
 const router = express.Router();
 

@@ -3,7 +3,10 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-const { initializeDatabase } = require('./database');
+
+// Use PostgreSQL for production (Railway), SQLite for local development
+const databaseModule = process.env.DATABASE_URL ? './database' : './database-sqlite';
+const { initializeDatabase } = require(databaseModule);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -145,7 +148,7 @@ async function startServer() {
 }
 
 // Graceful shutdown
-const { closeDatabase } = require('./database');
+const { closeDatabase } = process.env.DATABASE_URL ? require('./database') : { closeDatabase: async () => console.log('SQLite database closed') };
 
 process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully...');

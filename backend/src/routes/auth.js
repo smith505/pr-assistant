@@ -2,11 +2,14 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
+
+// Use PostgreSQL for production (Railway), SQLite for local development
+const databaseModule = process.env.DATABASE_URL ? '../database' : '../database-sqlite';
 const {
   getUserByEmail,
   createUser,
   getUserStats
-} = require('../database');
+} = require(databaseModule);
 const { verifyToken } = require('../middleware/auth');
 
 const router = express.Router();
@@ -33,7 +36,7 @@ router.post('/register', async (req, res) => {
     }
 
     // Check if user already exists
-    const existingUser = getUserByEmail(email);
+    const existingUser = await getUserByEmail(email);
     if (existingUser) {
       return res.status(409).json({
         error: 'User already exists',
@@ -48,7 +51,7 @@ router.post('/register', async (req, res) => {
     const apiToken = uuidv4();
 
     // Create user
-    const userId = createUser(email, passwordHash, apiToken);
+    const userId = await createUser(email, passwordHash, apiToken);
 
     res.status(201).json({
       success: true,
@@ -83,7 +86,7 @@ router.post('/login', async (req, res) => {
     }
 
     // Get user
-    const user = getUserByEmail(email);
+    const user = await getUserByEmail(email);
     if (!user) {
       return res.status(401).json({
         error: 'Invalid credentials',
@@ -121,10 +124,10 @@ router.post('/login', async (req, res) => {
 });
 
 // Get current user info
-router.get('/me', verifyToken, (req, res) => {
+router.get('/me', verifyToken, async (req, res) => {
   try {
     const user = req.user;
-    const stats = getUserStats(user.id);
+    const stats = await getUserStats(user.id);
 
     res.json({
       success: true,
@@ -178,18 +181,24 @@ router.post('/upgrade-to-pro', async (req, res) => {
       });
     }
 
-    // Import database pool
-    const { pool } = require('../database');
-
     // Calculate expiration (1 year from now)
     const activeUntil = new Date();
     activeUntil.setFullYear(activeUntil.getFullYear() + 1);
 
-    // Update user to Pro tier (PostgreSQL syntax)
-    await pool.query(
-      'UPDATE users SET tier = $1, active_until = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3',
-      ['pro', activeUntil, user.id]
-    );
+    // Update user to Pro tier
+    if (process.env.DATABASE_URL) {
+      // PostgreSQL syntax
+      const { pool } = require('../database');
+      await pool.query(
+        'UPDATE users SET tier = $1, active_until = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3',
+        ['pro', activeUntil, user.id]
+      );
+    } else {
+      // SQLite syntax
+      const { db } = require('../database-sqlite');
+      const stmt = db.prepare('UPDATE users SET tier = ?, active_until = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
+      stmt.run('pro', activeUntil.toISOString(), user.id);
+    }
 
     // Get updated user stats
     const stats = await getUserStats(user.id);
@@ -228,24 +237,44 @@ router.post('/delete-user', async (req, res) => {
       });
     }
 
-    const { pool } = require('../database');
+    let deletedEmail;
 
-    // Delete in correct order (foreign key constraints)
-    await pool.query('DELETE FROM usage WHERE user_id IN (SELECT id FROM users WHERE email = $1)', [email]);
-    await pool.query('DELETE FROM subscriptions WHERE user_id IN (SELECT id FROM users WHERE email = $1)', [email]);
-    const result = await pool.query('DELETE FROM users WHERE email = $1 RETURNING email', [email]);
+    if (process.env.DATABASE_URL) {
+      // PostgreSQL
+      const { pool } = require('../database');
+      await pool.query('DELETE FROM usage WHERE user_id IN (SELECT id FROM users WHERE email = $1)', [email]);
+      await pool.query('DELETE FROM subscriptions WHERE user_id IN (SELECT id FROM users WHERE email = $1)', [email]);
+      const result = await pool.query('DELETE FROM users WHERE email = $1 RETURNING email', [email]);
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({
-        error: 'User not found',
-        message: `No user found with email: ${email}`
-      });
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          error: 'User not found',
+          message: `No user found with email: ${email}`
+        });
+      }
+      deletedEmail = result.rows[0].email;
+    } else {
+      // SQLite
+      const { db } = require('../database-sqlite');
+      const user = db.prepare('SELECT id, email FROM users WHERE email = ?').get(email);
+
+      if (!user) {
+        return res.status(404).json({
+          error: 'User not found',
+          message: `No user found with email: ${email}`
+        });
+      }
+
+      db.prepare('DELETE FROM usage WHERE user_id = ?').run(user.id);
+      db.prepare('DELETE FROM subscriptions WHERE user_id = ?').run(user.id);
+      db.prepare('DELETE FROM users WHERE email = ?').run(email);
+      deletedEmail = user.email;
     }
 
     res.json({
       success: true,
       message: 'User deleted successfully',
-      email: result.rows[0].email
+      email: deletedEmail
     });
 
   } catch (error) {

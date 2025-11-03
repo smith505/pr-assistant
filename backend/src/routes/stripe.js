@@ -2,12 +2,15 @@
 const express = require('express');
 const Stripe = require('stripe');
 const { verifyToken } = require('../middleware/auth');
+
+// Use PostgreSQL for production (Railway), SQLite for local development
+const databaseModule = process.env.DATABASE_URL ? '../database' : '../database-sqlite';
 const {
   updateUserTier,
   upsertSubscription,
   getSubscriptionByStripeId,
   getUserByEmail
-} = require('../database');
+} = require(databaseModule);
 
 const router = express.Router();
 

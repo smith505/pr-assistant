@@ -1,6 +1,9 @@
 // Authentication middleware
 const jwt = require('jsonwebtoken');
-const { getUserByToken, getMonthlyUsage } = require('../database');
+
+// Use PostgreSQL for production (Railway), SQLite for local development
+const databaseModule = process.env.DATABASE_URL ? '../database' : '../database-sqlite';
+const { getUserByToken, getMonthlyUsage } = require(databaseModule);
 
 // Verify API token from request headers
 function verifyToken(req, res, next) {
