@@ -42,9 +42,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Initialize database
-initializeDatabase();
-
 // Serve static files (privacy policy, etc.)
 const path = require('path');
 app.use(express.static(path.join(__dirname, '..', 'public')));
@@ -109,9 +106,15 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Endpoint not found' });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`
+// Start server with async database initialization
+async function startServer() {
+  try {
+    // Initialize database
+    await initializeDatabase();
+
+    // Start Express server
+    app.listen(PORT, () => {
+      console.log(`
 ╔════════════════════════════════════════════════════════════╗
 ║                                                            ║
 ║   GitHub PR Review Assistant Backend API                   ║
@@ -134,15 +137,27 @@ app.listen(PORT, () => {
   if (!process.env.STRIPE_WEBHOOK_SECRET) {
     console.warn('⚠️  WARNING: STRIPE_WEBHOOK_SECRET not configured');
   }
-});
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+}
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
+const { closeDatabase } = require('./database');
+
+process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully...');
+  await closeDatabase();
   process.exit(0);
 });
 
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
   console.log('\nSIGINT received, shutting down gracefully...');
+  await closeDatabase();
   process.exit(0);
 });
+
+// Start the server
+startServer();
